@@ -1,21 +1,38 @@
 package ru.maxima.controllers;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 import ru.maxima.Dto.PersonDto;
+import ru.maxima.models.Person;
+import ru.maxima.service.RestService;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
+@RequestMapping(path = "/bank",
+        produces = "templates/bank")
 public class BankController {
 
+    private final RestService service;
+
+    @Autowired
+    public BankController(RestService service) {
+        this.service = service;
+    }
 
 
-    @GetMapping(value = "/api/jackson-xml", produces = "templates/bank")
-    public PersonDto jacksonXml() {
-        BigDecimal decimal = new BigDecimal("1.34");
-        return new PersonDto("Михаил", decimal);
+    @ResponseBody
+    @GetMapping()
+    public List<PersonDto> jacksonXml() {
+
+        List<Person> people = service.getAllPerson();
+        List<PersonDto> result = new ArrayList<>();
+        people.forEach(person -> {
+            result.add(service.convertToPersonDTO(person));
+        });
+        return result;
     }
 
 }

@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 
 @Data
+@JacksonXmlRootElement(localName = "Person")
 public class PersonDto {
 
     private String name;

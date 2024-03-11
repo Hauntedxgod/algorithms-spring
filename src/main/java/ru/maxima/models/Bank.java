@@ -8,10 +8,14 @@ import lombok.RequiredArgsConstructor;
 import java.math.BigDecimal;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
-@RequiredArgsConstructor
 public class Bank {
 
     private BigDecimal wallet;
+
+    public Bank() {
+    }
+
+    public Bank(BigDecimal wallet) {
+        this.wallet = wallet;
+    }
 }
