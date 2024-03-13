@@ -17,6 +17,7 @@ public class AlgorithmsSpringApplication {
     }
 
 
+    @Bean
     public ModelMapper modelMapper(){
         return new ModelMapper();
     }
