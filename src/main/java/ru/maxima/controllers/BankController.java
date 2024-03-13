@@ -40,24 +40,31 @@ public class BankController {
         return person;
     }
 
-//    public String getResult(@ModelAttribute("bank") @Valid Bank bank , BindingResult bindingResult) {
-//        BigDecimal allMoney = bank.getWallet();
-//        for (Person p : bank.getPeople()) {
-//            allMoney = p.getWallet();
-//        }
-//        BigDecimal avgSum = allMoney / bank.getPeople().size();
-//        BankDto bankDto = new BankDto();
-//        List<Person> resultPerson = new ArrayList<>();
-//        for (Person p : bank.getPeople()) {
-//            resultPerson.add(Person.builder()
-//                    .wallet(p.getWallet())
-//                    .name(p.getName())
-//                    .appendFromBank(avgSum - p.getWallet())
-//                    .build());
-//        }
-//        bankDto.setResult(resultPerson);
-//        bankDto.setMinimum(new ArrayList<>());
-//        return null;
-//    }
+    public String getResult(@ModelAttribute("bank") @Valid Bank bank , BindingResult bindingResult) {
+        BigDecimal allMoney = bank.getWallet();
+        for (Person p : bank.getPeople()) {
+            allMoney = p.getWallet();
+        }
+        BigDecimal avgSum = allMoney / bank.getPeople().size();
+        BankDto bankDto = new BankDto();
+        List<Person> resultPerson = new ArrayList<>();
+        for (Person p : bank.getPeople()) {
+            resultPerson.add(Person.builder()
+                    .wallet(p.getWallet())
+                    .name(p.getName())
+                    .appendFromBank(avgSum - p.getWallet())
+                    .build());
+        }
+
+        for (Person a : resultPerson) {
+            resultPerson.add(Person.builder()
+                    .wallet(a.getWallet())
+                    .name(a.getName())
+                    .appendFromBank(avgSum - a.getWallet().min()).build());
+        }
+        bankDto.setResult(resultPerson);
+        bankDto.setMinimum(new ArrayList<>());
+        return null;
+    }
 
 }
