@@ -57,10 +57,10 @@ public class BankController {
         }
 
         for (Person a : resultPerson) {
-            resultPerson.add(Person.builder()
+            resultPerson(Person.builder()
                     .wallet(a.getWallet())
                     .name(a.getName())
-                    .appendFromBank(avgSum - a.getWallet().min()).build());
+                    .appendFromBank(a.getWallet().min()).build());
         }
         bankDto.setResult(resultPerson);
         bankDto.setMinimum(new ArrayList<>());
