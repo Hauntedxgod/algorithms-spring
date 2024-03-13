@@ -1,7 +1,6 @@
 package ru.maxima.controllers;
 
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.validation.BindingResult;
@@ -40,7 +39,7 @@ public class BankController {
         return person;
     }
 
-    public String getResult(@ModelAttribute("bank") @Valid Bank bank , BindingResult bindingResult) {
+    public BankDto getResult(@ModelAttribute("bank") @Valid Bank bank , BindingResult bindingResult) {
         BigDecimal allMoney = bank.getWallet();
         for (Person p : bank.getPeople()) {
             allMoney = p.getWallet();
@@ -60,11 +59,11 @@ public class BankController {
             resultPerson(Person.builder()
                     .wallet(a.getWallet())
                     .name(a.getName())
-                    .appendFromBank(a.getWallet().min()).build());
+                    .appendFromBank(a.getWallet().min(avgSum).build()));
         }
         bankDto.setResult(resultPerson);
         bankDto.setMinimum(new ArrayList<>());
-        return null;
+        return bankDto;
     }
 
 }
