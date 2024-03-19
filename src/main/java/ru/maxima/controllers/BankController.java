@@ -7,15 +7,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
-import ru.maxima.Dto.BankDto;
+import ru.maxima.Dto.PersonDto;
+import ru.maxima.Dto.RequestDto;
+import ru.maxima.Dto.ResponseDto;
 import ru.maxima.exception.BankNotExceptionHandler;
-import ru.maxima.models.Bank;
-import ru.maxima.models.Person;
 
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @RestController
@@ -30,51 +30,48 @@ public class BankController {
 //    }
 
 
-    @PostMapping(consumes = MediaType.APPLICATION_XML_VALUE, produces = MediaType.APPLICATION_XML_VALUE)
-    public ResponseEntity<HttpStatus> jacksonXml(@RequestBody  @Valid  Person person , BindingResult result) {
-
-        checkErrors(result);
-
-        person.getName();
-        person.getWallet();
+    @PostMapping(consumes = MediaType.APPLICATION_XML_VALUE, produces = MediaType.APPLICATION_XML_VALUE ,
+            path = "/test")
+    public ResponseEntity<HttpStatus> jacksonXml(@RequestBody  @Valid RequestDto requestDto, BindingResult result) {
+//        Double sum = requestDto.getWallet();
+//        for (PersonDto person : requestDto.getPerson()) {
+//            sum += person.getWallet();
+//        }
+//        Double avgSum = sum / requestDto.getPerson().size();
+//
+//        for (PersonDto person : requestDto.getPerson()) {
+//            person.setAppendFromBank(avgSum - person.getWallet());
+//        }
+//
+//        ResponseDto responseDto = new ResponseDto();
+//        responseDto.setResult(requestDto.getPerson());
+//        responseDto.setMinimum(new ArrayList<>());
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
 
-    @PostMapping(consumes = MediaType.APPLICATION_XML_VALUE, produces = MediaType.APPLICATION_XML_VALUE)
-    public BankDto getResult(@ModelAttribute("bank") @Valid Bank bank , BindingResult bindingResult) {
+    @PostMapping(consumes = MediaType.APPLICATION_XML_VALUE, produces = MediaType.APPLICATION_XML_VALUE ,
+            path = "/result")
+    public ResponseEntity<ResponseDto> getResult(@ModelAttribute @Valid RequestDto requestDto , BindingResult bindingResult) {
 
-        BigDecimal allMoney;
-        allMoney = bank.getWallet();
-        for (Person p : bank.getPeople()) {
+        BigDecimal allMoney = requestDto.getWallet();
+        for (PersonDto p : requestDto.getPerson()) {
             allMoney = p.getWallet();
         }
         BigDecimal avgSum;
-        avgSum = allMoney.divide(BigDecimal.valueOf(bank.getPeople().size()), RoundingMode.CEILING);
-        BankDto bankDto = new BankDto();
-        List<Person> resultPerson = new ArrayList<>();
-        for (Person p : bank.getPeople()) {
-            resultPerson.add(Person.builder()
-                    .wallet(p.getWallet())
-                    .name(p.getName())
-                    .appendFromBank(avgSum.subtract(p.getWallet()))
-                    .build());
+        avgSum = allMoney.divide(BigDecimal.valueOf(requestDto.getPerson().size()));
+        for (PersonDto p : requestDto.getPerson()) {
+           p.setAppendFromBank(avgSum.subtract(p.getWallet()));
         }
 
-        for (Person a : resultPerson) {
-            resultPerson(Person.builder()
-                    .wallet(a.getWallet())
-                    .name(a.getName())
-                    .appendFromBank(a.getWallet().min(avgSum).build()));
-//            BigDecimal min =resultPerson
-//                    .stream()
-//                    .map(a::getName)
-//                    .min(a.getWallet().min(avgSum))
-//                    .orElse(BigDecimal.ZERO);
-        }
-        bankDto.setResult(resultPerson);
-        bankDto.setMinimum(new ArrayList<>());
-        return bankDto;
+        ResponseDto responseDto = new ResponseDto();
+        List<PersonDto> resultPerson = new ArrayList<>();
+
+        List<PersonDto> minimumPerson = resultPerson.stream().sorted(Comparator
+                .comparing(PersonDto:: getAppendFromBank )).toList().subList(0, 3);
+        responseDto.setResult(resultPerson);
+        responseDto.setMinimum(minimumPerson);
+        return ResponseEntity.ok(responseDto);
     }
 
     public void checkErrors(BindingResult result) {
