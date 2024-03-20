@@ -14,6 +14,7 @@ import ru.maxima.exception.BankNotExceptionHandler;
 
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -52,23 +53,30 @@ public class BankController {
 
     @PostMapping(consumes = MediaType.APPLICATION_XML_VALUE, produces = MediaType.APPLICATION_XML_VALUE ,
             path = "/result")
-    public ResponseEntity<ResponseDto> getResult(@ModelAttribute @Valid RequestDto requestDto , BindingResult bindingResult) {
+    public ResponseEntity<ResponseDto> getResult(@RequestBody @Valid RequestDto requestDto , BindingResult bindingResult) {
+
+
+
+        ResponseDto responseDto = new ResponseDto();
+
 
         BigDecimal allMoney = requestDto.getWallet();
+        if(requestDto.getPerson() == null ){
+            throw new BankNotExceptionHandler("Arr");
+        }
         for (PersonDto p : requestDto.getPerson()) {
             allMoney = p.getWallet();
         }
         BigDecimal avgSum;
-        avgSum = allMoney.divide(BigDecimal.valueOf(requestDto.getPerson().size()));
+        avgSum = allMoney.divide(BigDecimal.valueOf(requestDto.getPerson().size()) , 2 , RoundingMode.CEILING);
         for (PersonDto p : requestDto.getPerson()) {
            p.setAppendFromBank(avgSum.subtract(p.getWallet()));
         }
 
-        ResponseDto responseDto = new ResponseDto();
-        List<PersonDto> resultPerson = new ArrayList<>();
 
+        List<PersonDto> resultPerson = requestDto.getPerson();
         List<PersonDto> minimumPerson = resultPerson.stream().sorted(Comparator
-                .comparing(PersonDto:: getAppendFromBank )).toList().subList(0, 3);
+                .comparing(PersonDto:: getAppendFromBank )).toList().subList(0 , 3); // Ошибка здесь !//Ошибка здесь !
         responseDto.setResult(resultPerson);
         responseDto.setMinimum(minimumPerson);
         return ResponseEntity.ok(responseDto);

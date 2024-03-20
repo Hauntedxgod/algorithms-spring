@@ -15,11 +15,11 @@ import java.util.List;
 @JacksonXmlRootElement
 public class ResponseDto {
 
-    @JacksonXmlProperty(localName = "total" , namespace = "result")
+    @JacksonXmlProperty(localName = "result" , namespace = "result")
     @JacksonXmlElementWrapper(useWrapping = false)
     private List<PersonDto> result;
 
-    @JacksonXmlProperty(localName = "total2" , namespace = "minimum")
+    @JacksonXmlProperty(localName = "minimum" , namespace = "minimum")
     @JacksonXmlElementWrapper(useWrapping = false)
     private List<PersonDto> minimum;
 }

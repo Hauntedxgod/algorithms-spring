@@ -21,7 +21,7 @@ public class RequestDto {
     private BigDecimal wallet;
 
 
-    @JacksonXmlProperty(localName = "Person1" , namespace = "person")
+    @JacksonXmlProperty(localName = "Person" , namespace = "person")
     @JacksonXmlElementWrapper(useWrapping = false)
     private List<PersonDto> person;
 }
